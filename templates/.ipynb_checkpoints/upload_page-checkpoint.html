@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+{% block javascript %}
+
+    <script type="text/javascript">
+        Dropzone.autoDiscover = false;
+        $(function () {
+            var myDropzone = new Dropzone("#myDropzone", {
+                paramName: 'file',
+                //headers: {'X-csrf_token': csrf_token },
+                //autoQueue false for checking the size before sending
+                autoQueue: true,
+                url: "/classify_upload",
+                renameFilename: "file",
+                init: function () {
+
+//                     this.on("success", function (file, response) {
+//                         var result = $('<div />').append(response).find('#containerId').html();
+//                         $('#result').prepend(result);
+//                     });
+
+                }
+            });
+        })
+    </script>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div>
+            <h3> Upload your images </h3>
+            <form id="myDropzone" class="dropzone" action=""></form>
+        </div>
+    </div>
+    <br/>
+    <div class="container" id="result"></div>
+{% endblock %}

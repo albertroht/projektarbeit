@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- These 3 meta tags MUST come first -->
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=0">
+<!-- These 3 meta tags MUST come first -->
+
+<title>Classification Demo</title>
+
+<!-- Bootstrap CSS and JS -->
+<link href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+            <script src="{{ url_for('static', filename='bootstrap/js/html5shiv.min.js') }}"></script>
+            <script src="{{ url_for('static', filename='bootstrap/js/respond.min.js') }}"></script>
+        <![endif]-->
+
+<!-- Application specific CSS-->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+<!---scripts needed for the cewemyphoto part-->
+<script src="{{ url_for('static', filename='bootstrap/js/jquery.min.js') }}"></script>
+
+<script src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
+<!--scripts needed for dropzone part-->
+<link href="{{ url_for('static', filename='dropzone/dropzone.css') }}" rel="stylesheet">
+<script src="{{ url_for('static', filename='dropzone/dropzone.js') }}"></script>
+
+
+<!--for the acordion-->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="{{ url_for('static', filename='jquery-ui/jquery-ui.min.js') }}"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='jquery-ui/jquery-ui.min.css') }}">
+
+<!--script src="https://code.jquery.com/jquery-1.12.4.js"></script-->
+
+
+<style>
+    .selected {
+        5px solid #f00;
+        border: 2px solid black;
+    }
+</style>    
+    
+{% block javascript %}{% endblock %}
+</head>
+<body>
+
+{% block body %}
+    <!-- Application specific HTML -->
+    <div id="header-div" class="clearfix with-margins">
+        <div class="pull-left"><a href="{{ url_for('home_page') }}"><span
+                class="header-title">header_title</span></a></div>
+    </div>
+    <div class="with-margins">
+        <a href="{{ url_for('home_page') }}">Home</a>
+        <a href="{{ url_for('upload_page') }}">Upload</a>
+        <a href="{{ url_for('show_images_page') }}">Images</a>
+        <a href="{{ url_for('tags_page') }}">Tags</a>
+    </div>
+    <hr class="no-margins"/>
+
+    <div id="main-div" class="with-margins">
+        {% block pre_content %}{% endblock %}
+
+        {% block content %}{% endblock %}
+
+        {% block post_content %}{% endblock %}
+    </div>
+
+    <br/>
+    <hr class="no-margins"/>
+    <div id="footer-div" class="clearfix with-margins">
+        <div class="pull-left">foot v1.0</div>
+        <!--div class="pull-right">&copy; 2014 MyCorp</div-->
+    </div>
+
+{% endblock %}
+
+
+</body>
+</html>

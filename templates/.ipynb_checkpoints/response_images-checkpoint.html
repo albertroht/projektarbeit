@@ -1,0 +1,35 @@
+<div class="container" id="containerId">
+    <br>
+        <div>
+             {% for image_src,image_id,aesthetic_score,tags,selected in image_srcs %}
+                 <div class="col-sm-6 col-md-4 col-lg-2">
+                    <div class="thumbnail">
+                        <img src="{{ image_src }}" id="{{image_id}}"{% if selected == True %} class='selected' {% endif %} alt="Lights" style="width:100%">
+                        <div class="caption">{{aesthetic_score}}</div>
+                        <div class="caption">{{tags}}</div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    <script>
+        $(function() {
+            $('img').click(function() {
+                var id = $(this).attr("id");
+                if($(this).hasClass('selected')) {
+                    $(this).removeClass('selected');
+                    var posting = $.post("show_images", {
+                        image_id : id,
+                        selected : true
+                    });
+                }
+                else {  
+                    $(this).addClass('selected');
+                    var posting = $.post("show_images", {
+                        image_id : id,
+                        selected : false
+                    });
+                }
+            });
+        });
+    </script>
+</div>
