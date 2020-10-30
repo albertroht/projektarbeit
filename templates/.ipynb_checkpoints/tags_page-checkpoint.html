@@ -1,0 +1,45 @@
+{% extends "layout.html" %}
+{% block content %}
+    <button id='start_tagging'>Start Tagging</button>
+    <div id="accordion">
+        {% for tag, occurence in tag_occurences %}
+            <a id="{{loop.index0}}">
+                <li>{{ tag }}<span class="badge">{{ occurence }}</span></li>
+            </a>
+        {% endfor %}
+    </div>
+    <div class="container" id="result"></div>
+{% endblock %}
+
+{% block javascript %}
+    <script type="text/javascript">
+        $(function () {
+//             $("#accordion").accordion({collapsible: true});
+            $("input").checkboxradio({icon: false});
+
+            {% for tag, occurence in tag_occurences %}
+                $('#{{ loop.index0 }}').on("click", function () {
+                    var badges = $.post("#", {
+                        tag: "{{ tag_occurences[loop.index0][0] }}",
+                    });
+                    badges.done(function (response) {
+                        var result = $('<div />').append(response).find('#containerId').html();
+                        $('#result').empty().prepend(result);
+                    });
+                });
+            {% endfor %}
+            $("#start_tagging").click(function(){
+                var posting = $.post("/analyze_for_tags", {
+                    });
+                posting.done(function(){
+                    location.reload();
+                });
+                
+            });
+        });
+             
+    </script>
+{% endblock %}
+
+
+

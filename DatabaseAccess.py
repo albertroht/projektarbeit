@@ -11,6 +11,7 @@ class Image(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     selected = Column(Boolean)
     aesthetic_score = Column(Float)
+    faces_count = Column(Integer)
     
     def __init__(self):
         self.selected = False
@@ -27,6 +28,15 @@ class Tag(Base):
         self.image_id = image_id
         self.tag_name = tag_name
         self.score = score
+        
+class NearDuplicateCluster(Base):
+    __tablename__ = "nearDuplicateCluster"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    image_ids = Column(String, nullable=False)
+
+    def __init__(self, image_ids):
+        self.image_ids = image_ids
         
 class DatabaseAccess:
     def __init__(self, database_name):
@@ -50,6 +60,14 @@ class DatabaseAccess:
     def get_image(self, image_id):
         return self.session.query(Image).filter_by(id = image_id).first()
     
+    def delete_image(self, image_id):
+        for ndc in self.session.query(NearDuplicateCluster):
+            if str(image_id) in ndc.image_ids.split("/"):
+                self.session.query(NearDuplicateCluster).filter_by(id=ndc.id).delete()
+        self.session.query(Image).filter_by(id=int(image_id)).delete()
+        self.session.commit()
+        return
+    
     def updateImageSelected(self, image_id, selected):
         self.session.query(Image).filter_by(id = image_id).update({"selected" : selected})
         
@@ -57,9 +75,19 @@ class DatabaseAccess:
         self.session.query(Image).filter_by(id = image_id).update({"aesthetic_score" : aesthetic_score})
         self.session.commit()
         
+    def updateFacesCount(self, image_id, faces_count):
+        self.session.query(Image).filter_by(id = image_id).update({"faces_count" : faces_count})
+        self.session.commit()
+        
+    
     def getTags(self, image_id):
         tags = self.session.query(Tag).filter_by(image_id = image_id)
         return [(tag.tag_name,round(tag.score,2)) for tag in tags]
+    
+    def getSelected(self, image_id):
+        image = self.session.query(Image).filter_by(id = int(image_id)).first()
+        print(image)
+        return image.selected
     
     def getImagesWithTag(self, tag_name):
         tags = self.session.query(Tag).filter_by(tag_name = tag_name)
@@ -76,3 +104,8 @@ class DatabaseAccess:
         tag_occurence_list.sort(key=lambda tup: tup[1], reverse=True)
         return tag_occurence_list
         
+    def dropNearDuplicateClusterTable(self):
+        self.session.query(NearDuplicateCluster).delete()
+        
+    def getAllCluster(self):
+        return self.session.query(NearDuplicateCluster)
