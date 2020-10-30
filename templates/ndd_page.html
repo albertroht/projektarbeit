@@ -1,0 +1,74 @@
+{% extends "layout.html" %}
+
+{% block javascript %}
+    <script type="text/javascript">
+        var counter = 0;
+        $(function(){
+            $('#ndd_start').click(function(){
+                if (counter == 0) {
+                    counter = 1;
+                    $('#result').empty();
+                    var posting = $.post("#", {
+                    });
+                    posting.done(function (response) {
+                        // find for children, filter for root => append makes everything child
+                        var result = $('<div />').append(response).find('#containerId').html();
+                        counter = 0;
+                        $('#result').prepend(result);
+                    });
+                }else{
+                    alert("wait for ndd to finish");
+                }
+            });
+            $('#delete_duplicates').click(function(){
+                var posting = $.post("/delete_duplicates", {
+                });
+                $('#result').empty();
+            }); 
+        })
+    </script>
+{% endblock %}
+
+{% block content %}
+    <button id="ndd_start">Start ndd</button>
+    <button id="delete_duplicates">Delete Duplicate</button>
+    <br/>
+    <div class="container" id="result">
+        {% for cluster in cluster_list %}
+        <br>
+            <div class="container">
+                {% for image_src, image_id, selected in cluster %}
+                     <div class="col-sm-6 col-md-4 col-lg-2">
+                         <div class="thumbnail">
+    <!--                          <img src="{{ image_src }}" id="{{image_id}}"{% if selected == True %} class='selected' {% endif %} alt="Lights" style="width:100%"> -->
+                             <img src="{{ image_src }}" id="{{image_id}}" {% if selected == True %} class='selected' {% endif %} alt="Lights" style="width:100%">
+                             {{image_id}}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endfor %}
+    <script>
+        $(function() {
+            $('img').click(function() {
+                var id = $(this).attr("id");
+                if($(this).hasClass('selected')) {
+                    $(this).removeClass('selected');
+                    var posting = $.post("/select", {
+                        image_id : id,
+                        selected : true
+                    });
+                }
+                else {  
+                    $(this).addClass('selected');
+                    var posting = $.post("/select", {
+                        image_id : id,
+                        selected : false
+                    });
+                }
+            });
+        });
+        </script>
+        
+    </div>
+{% endblock %}
