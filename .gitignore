@@ -1,3 +1,4 @@
 image_analysis/oidv2/*
 image_analysis/oidv2/oidv2-resnet_v1_101.ckpt.data-00000-of-00001
 image_analysis/face_scoring/yoloface/model-weights/*
+image_analysis/face_scoring/shape*
