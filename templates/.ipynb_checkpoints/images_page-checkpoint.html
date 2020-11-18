@@ -1,0 +1,75 @@
+{% extends "layout.html" %}
+
+{% block javascript %}
+    <script>
+        var counter = 0;
+        $(function() {
+            $('img').click(function() {
+                var id = $(this).attr("id");
+                if($(this).hasClass('selected')) {
+                    $(this).removeClass('selected');
+                    var posting = $.post("/select", {
+                        image_id : id,
+                        selected : true
+                    });
+                }
+                else {  
+                    $(this).addClass('selected');
+                    var posting = $.post("/select", {
+                        image_id : id,
+                        selected : false
+                    });
+                }
+            });
+            $('#delete_all').click(function(){
+                $('#result').empty();
+                var posting = $.post("#", {
+                    task: "delete_all",
+                });
+            });
+            $('#select_all').click(function(){
+                var posting = $.post("#", {
+                    task: "select_all",
+                });
+                posting.done(function (response) {
+                       location.reload();
+                });
+            });
+            $('#unselect_all').click(function(){
+                var posting = $.post("#", {
+                    task: "unselect_all",
+                });
+                posting.done(function (response) {
+                       location.reload();
+                });
+            });
+            $('#delete_unselected').click(function(){
+                var posting = $.post("#", {
+                    task: "delete_unselected",
+                });
+                posting.done(function (response) {
+                       location.reload();
+                });
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block content %}
+<!--     <button id="faces_start">Start Face Detection</button> -->
+    <button id="delete_all">Delete All</button>
+    <button id="delete_unselected">Delete Unselected</button>
+    <button id="select_all">Select ALL</button>
+    <button id="unselect_all">Unselect All</button>
+    <br/>
+    <div class="container" id="result">
+        {% for image_src,image_id,image_date,selected in image_srcs %}
+         <div class="col-sm-6 col-md-4 col-lg-2">
+            <div class="thumbnail">
+                <img src="{{ image_src }}" id="{{image_id}}"{% if selected == True %} class='selected' {% endif %} alt="Lights" style="width:100%">
+                <div class="caption">{{image_date}}</div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% endblock %}

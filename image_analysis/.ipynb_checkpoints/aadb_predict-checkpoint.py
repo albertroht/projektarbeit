@@ -64,6 +64,7 @@ transform = transforms.Compose([
 
 def predict_aesthetic(image_path):
     image_default = mpimg.imread(image_path)
+    print(image_default.shape)
     image = transform(image_default)
     inp = Variable(image).unsqueeze(0)
     if use_cuda:

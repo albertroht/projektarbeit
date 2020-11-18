@@ -1,7 +1,8 @@
 {% extends "layout.html" %}
 {% block content %}
-    <button id='start_tagging'>Start Tagging</button>
-    <div id="accordion">
+    <div id = "leftbox">
+        <button id='start_tagging'>Start Tagging</button>
+
         {% for tag, occurence in tag_occurences %}
             <a id="{{loop.index0}}">
                 <li>{{ tag }}<span class="badge">{{ occurence }}</span></li>
@@ -9,6 +10,7 @@
         {% endfor %}
     </div>
     <div class="container" id="result"></div>
+
 {% endblock %}
 
 {% block javascript %}
@@ -29,15 +31,16 @@
                 });
             {% endfor %}
             $("#start_tagging").click(function(){
-                var posting = $.post("/analyze_for_tags", {
+                var posting = $.post("#", {
+                    task: "analyze_for_tags"
                     });
+                $('#start_tagging').after('<br><p>Wait for tag analysis to finish or come back later</p>');
                 posting.done(function(){
                     location.reload();
                 });
                 
             });
         });
-             
     </script>
 {% endblock %}
 

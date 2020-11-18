@@ -12,6 +12,8 @@ class Image(Base):
     selected = Column(Boolean)
     aesthetic_score = Column(Float)
     faces_count = Column(Integer)
+    date = Column(String)
+    convenience_score = Column(Float)
     
     def __init__(self):
         self.selected = False
@@ -65,14 +67,38 @@ class DatabaseAccess:
             if str(image_id) in ndc.image_ids.split("/"):
                 self.session.query(NearDuplicateCluster).filter_by(id=ndc.id).delete()
         self.session.query(Image).filter_by(id=int(image_id)).delete()
+        self.session.query(Tag).filter_by(image_id=int(image_id)).delete()
         self.session.commit()
         return
+    
+    def delete_tags(self):
+        images = self.session.query(Image)
+        for image in images:
+            self.session.query(Tag).filter_by(image_id=image.id).delete()
+        self.session.commit()
+    
+    def delete_all(self):
+        self.session.query(NearDuplicateCluster).delete()
+        self.session.query(Image).delete()
+        self.session.query(Tag).delete()
+        self.session.commit()
+        
+    def delete_unselected_convenient_images(self):
+        self.session.query(Image).filter(Image.selected == False).filter(Image.convenience_score > 0.95).delete()
+        self.session.commit()
     
     def updateImageSelected(self, image_id, selected):
         self.session.query(Image).filter_by(id = image_id).update({"selected" : selected})
         
+    def updateImageDate(self, image_id, date):
+        self.session.query(Image).filter_by(id = image_id).update({"date" : date})
+        
     def updateImageAesthetic(self, image_id, aesthetic_score):
         self.session.query(Image).filter_by(id = image_id).update({"aesthetic_score" : aesthetic_score})
+        self.session.commit()
+        
+    def updateImageConvenience(self, image_id, convenience_score):
+        self.session.query(Image).filter_by(id = image_id).update({"convenience_score" : convenience_score})
         self.session.commit()
         
     def updateFacesCount(self, image_id, faces_count):

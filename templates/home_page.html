@@ -1,8 +1,37 @@
 {% extends "layout.html" %} 
 
 {% block content %}
-<h1>Home page</h1>
-    <p>
-        <h2>TODO: Beschreibung was hier gemacht werden kann</h2>
-    </p>
+<p>On this website you can manage your big image collection by analysing yor images through deep learning methods. In the following will be described what you can do on this website.</p>
+<h4>How to manage your image collection:</h4>
+<ul>
+    <li>
+        Under <a href="{{ url_for('upload_page') }}">Upload</a> you can upload your images.
+    </li>
+    <li>
+        Under <a href="{{ url_for('images_page') }}">Images</a> you can manage your uploaded Images manually.
+    </li>
+    <li>
+        Under <a href="{{ url_for('aesthetics_page') }}">Aesthetics</a> you can analyze your images for aesthetics.
+        Every Image gets an corresponging aesthetic score, so you can find your most aesthetic images.
+    </li>
+    <li>
+        Under <a href="{{ url_for('faces_page') }}">Faces</a> you can analyze your images for upcoming faces. 
+        Your Images with found faces will be shown and sorted by the number of faces found in the images.
+    </li>
+    <li>
+        Under <a href="{{ url_for('tags_page') }}">Tags</a> you can analyze your images for 600 categories. 
+        Your images will be tagged by the found categories.
+        After the analyzis you can see a list of all the found categories and will be able to click on them to see the corresponding images.
+    </li>
+    <li>
+        Under <a href="{{ url_for('ndd_page') }}">NDD</a> (Near Duplicate Detection) you can analyze your images for duplicates, 
+        so you can delete the unwanted duplicates in your image collection.
+    </li>
+    <li>
+        Under <a href="{{ url_for('convenience_page') }}">Convenience</a> you can analyze your images to find all the convenient images in your collection,
+        like old bills, screenshots, messages, ... and delete those that you no longer need.
+    </li>
+
+
+</ul>
 {% endblock %}

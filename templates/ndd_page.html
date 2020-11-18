@@ -9,19 +9,19 @@
                     counter = 1;
                     $('#result').empty();
                     var posting = $.post("#", {
+                        task: "ndd_start"
                     });
+                    $('#result').after('<br><p>Wait for Near Duplicate Detection to finish or come back later</p>');
                     posting.done(function (response) {
-                        // find for children, filter for root => append makes everything child
-                        var result = $('<div />').append(response).find('#containerId').html();
-                        counter = 0;
-                        $('#result').prepend(result);
+                       location.reload();
                     });
                 }else{
                     alert("wait for ndd to finish");
                 }
             });
             $('#delete_duplicates').click(function(){
-                var posting = $.post("/delete_duplicates", {
+                var posting = $.post("#", {
+                    task: "delete_duplicates"
                 });
                 $('#result').empty();
             }); 

@@ -28,14 +28,12 @@ $(function() {
             $('#result').empty();
             var posting = $.post("#", {
             });
+            $('#result').after('<br><p>Wait for aesthetic analysis to finish or come back later</p>');
             posting.done(function (response) {
-                var result = $('<div />').append(response).find('#containerId').html();
-                alert("done");
-                counter = 0;
-                $('#result').prepend(result);
+                location.reload();
             });
         }else{
-            alert("wait for ndd to finish");
+            alert("wait for aesthetic to finish");
         }
     });
 });

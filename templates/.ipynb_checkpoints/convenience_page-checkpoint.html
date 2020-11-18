@@ -1,0 +1,68 @@
+{% extends "layout.html" %}
+
+{% block javascript %}
+
+<script>
+$(function() {
+    $('img').click(function() {
+        var id = $(this).attr("id");
+        if($(this).hasClass('selected')) {
+            $(this).removeClass('selected');
+            var posting = $.post("/select", {
+                image_id : id,
+                selected : true
+            });
+        }
+        else {  
+            $(this).addClass('selected');
+            var posting = $.post("/select", {
+                image_id : id,
+                selected : false
+            });
+        }
+    });
+    var counter = 0;
+    $('#convenience_start').click(function(){
+        if (counter == 0) {
+            counter = 1;
+            $('#result').empty();
+            var posting = $.post("#", {
+                task: "convenience_start"
+            });
+            posting.done(function (response) {
+                location.reload();
+            });
+            $('#result').after('<br><p>Wait for Analysis to finish or come back later</p>');
+        }else{
+            alert("wait for aesthetic to finish");
+        }
+    });
+    $('#delete_all').click(function(){
+        $('#result').empty();
+        var posting = $.post("#", {
+            task: "delete_unselected_convenient_images"
+        });
+        posting.done(function (response) {
+            location.reload();
+        });
+    });
+});
+</script>
+{% endblock %}
+
+{% block content %}
+    <button id="convenience_start">Start Convenience Analysis</button>
+    <button id="delete_all">Delete unselected convenient Images</button>
+
+    <div class="container" id="result">
+        {% for image_src,image_id,selected in image_srcs %}
+         <div class="col-sm-6 col-md-4 col-lg-2">
+            <div class="thumbnail">
+                <img src="{{ image_src }}" id="{{image_id}}"{% if selected == True %} class='selected' {% endif %} alt="Lights" style="width:100%">
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    
+{% endblock %}

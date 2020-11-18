@@ -62,3 +62,38 @@ def predict_tag(filename):
                 list_of_tags.append((display_name,round(score,2)))
 
         return list_of_tags
+    
+def predict_multiple_images(filenames):
+     with tf.Session() as sess:
+        saver = tf.train.import_meta_graph(checkpoint_path + ".meta")
+        saver.restore(sess, checkpoint_path)
+        graph = tf.get_default_graph()
+
+        input_operation = graph.get_operation_by_name('input_values')
+        output_operation = graph.get_operation_by_name('multi_predictions')
+
+        map_of_tags = dict()
+    
+        for filename, image_id in filenames: 
+            print(image_id)
+            list_of_tags = []
+
+            img = tf.gfile.FastGFile(filename, 'rb').read()
+            #img_array = np.asarray(img)
+            predictions_eval = sess.run(output_operation.outputs[0], {input_operation.outputs[0] : [img]})
+
+            top_k = predictions_eval.argsort()[::-1]
+
+            labels=''
+            for idx in top_k:
+                mid = labelmap[idx]
+                display_name = label_dict[mid]
+                score = predictions_eval[idx]
+                if score >= 0.3:
+                    # Creating list of database objects
+                    list_of_tags.append((display_name,round(score,2)))
+
+            map_of_tags[image_id] = list_of_tags
+            print(list_of_tags)
+
+        return map_of_tags

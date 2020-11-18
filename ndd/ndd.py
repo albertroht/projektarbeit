@@ -1,8 +1,8 @@
 #imports
 import sys
 # insert at 1, 0 is the script path (or '' in REPL)
-sys.path.insert(1, 'ndd/image_vectors/')
 sys.path.insert(1, '../')
+sys.path.insert(1, '/notebooks/Projektarbeit/ndd')
 
 import os
 import importlib
@@ -16,16 +16,13 @@ from keras.models import Model
 from keras.preprocessing.image import load_img
 from os import walk, path
 
+import image_clustering
+
 import itertools
 
 import importlib
-import image_clustering
-#importlib.reload(image_clustering)
 from image_clustering import get_similarities_for_filenames
 
-
-from ipywidgets import interact, interactive, fixed, interact_manual
-import ipywidgets as widgets
 import os
 import pickle
 import time
@@ -44,7 +41,7 @@ def get_temporally_close_image_tuples(timestamp_file_dict, seconds_distance = 5)
         # Get time-distance between images
         ms_time_difference = abs(timestamp_image_A - timestamp_image_B)
 
-        if ms_time_difference <= (seconds_distance * 10000):
+        if ms_time_difference <= (seconds_distance * 1000):
             potential_duplicate = {"filename_1" : combo[0], "filename_2" : combo[1]}
             temporally_close_image_tuples.append(potential_duplicate)
     
@@ -53,20 +50,20 @@ def get_temporally_close_image_tuples(timestamp_file_dict, seconds_distance = 5)
 def get_cluster_list(image_paths, similarity_rate, cluster_list_path=None,
                      save_path=None, batch_size=16):
         
-    from ndd_utils import get_date_taken, transform_date_taken_to_timestamp, show_images
-
+    from ndd_utils import get_date_taken, transform_date_taken_to_timestamp
     # Creating a list of dicts with each image filename and its timestamp for later reference
     timestamp_file_dict = {}
+    image_paths_with_timestamp = []    
 
     for image_path in image_paths:
         try:
             timestamp_file_dict[image_path] = transform_date_taken_to_timestamp(get_date_taken(image_path))
+            image_paths_with_timestamp.append(image_path)    
         except:
             pass
-        
 
     global combinations
-    combinations = itertools.combinations(image_paths, 2)
+    combinations = itertools.combinations(image_paths_with_timestamp, 2)
 
     print("Found %s images" % len(timestamp_file_dict))
     temporally_close_image_tuples = get_temporally_close_image_tuples(timestamp_file_dict)
@@ -132,25 +129,17 @@ def get_cluster_list(image_paths, similarity_rate, cluster_list_path=None,
 
     reset_keras(new_model)
 
-
-#             result = new_model.predict(np.concatenate((img,img),axis=0))
-#             print(result.shape)
-#             result = result[0].reshape((1024))
-#             filename_imagevector_dict = {"image_filename": filename,
-#                                          "vector" : result}
-
-#             result_list.append(filename_imagevector_dict.copy())
-
     results = pd.DataFrame(results)
 
     similarities_df = pd.DataFrame(get_similarities_for_filenames(results, filenames_to_evaluate,similarity_rate))
     print(similarities_df)
-    sorted_values = similarities_df.sort_values(by=["similarity"], ascending=False).reset_index(drop=True)
+    try:
+        sorted_values = similarities_df.sort_values(by=["similarity"], ascending=False).reset_index(drop=True)
+    except:
+        return []
 #         sorted_values.to_csv("sim_test.csv", decimal=".", sep=";", index=False)
     cluster_list = image_clustering.create_image_clusters(sorted_values, results)
 
-#         start = time.time()
-#         print("Zeit: %s" %(time.time() - start))
 
     if cluster_list_path:
         with open(cluster_list_path,"wb") as fp:
@@ -158,46 +147,3 @@ def get_cluster_list(image_paths, similarity_rate, cluster_list_path=None,
 
 
     return cluster_list
-
-
-
-def show_cluster(cluster_list, show=True, show_widgets=True):
-    from ndd_utils import show_images
-    doubles_widgets = {}
-    doubles = []
-    i = 0
-    for e in cluster_list:
-        image_list = [e.index_image_path, *(e.similar_images)]
-
-        auswahl = "" 
-        for x in image_list:
-            doubles.append(x)
-            auswahl += "'" + x + "',"
-        auswahl = auswahl [:-1]
-
-        exec("def f_%s(x_%s):return x_%s" % (i,i,i))
-        exec("doubles_widgets[%s]=(interactive(f_%s,x_%s=[%s]))" % (i,i,i,auswahl))
-        
-#         if show == True:
-        show_images(image_list, titles=image_list)
-#             if show_widgets == True:
-        display(doubles_widgets[i])
-
-        i += 1
-    return doubles_widgets,doubles
-
-def save_image_list_without_ndd(image_filenames,images_without_ndd_filename,doubles,doubles_widgets):
-    image_filenames_without_doubles = []
-    for x in image_filenames:
-        if x not in doubles:
-            image_filenames_without_doubles.append(x)
-
-    for x in doubles_widgets:
-        if doubles_widgets[x].result == None:
-            display(doubles_widgets[x])
-            doubles_widgets[x].layout.display = 'none'
-        image_filenames_without_doubles.append(doubles_widgets[x].result)
-
-
-    with open(images_without_ndd_filename,"wb") as fp:
-        pickle.dump(image_filenames_without_doubles,fp)
